@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MindBridge — Peer Community</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#08101A;--bg2:#0D1F30;--bg3:#112438;--mint:#0AFFB2;--mintglow:rgba(10,255,178,0.12);--red:#FF4D6D;--amber:#FFB830;--purple:#A78BFA;--white:#E8F4FF;--gray:#5A8AA0;--card-bdr:#1A3A55;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+    body{background:var(--bg);color:var(--white);font-family:var(--font-body);min-height:100vh}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 5%;background:rgba(8,16,26,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--card-bdr);position:sticky;top:0;z-index:100}
+    .nav-logo{font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:var(--mint);text-decoration:none}
+    .nav-logo span{color:var(--white)}
+    .nav-links{display:flex;gap:1.5rem;list-style:none}
+    .nav-links a{color:var(--gray);text-decoration:none;font-size:0.85rem;transition:color 0.2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--mint)}
+    .page-wrap{max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 5rem;display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start}
+    @media(max-width:768px){.page-wrap{grid-template-columns:1fr}}
+
+    /* Sidebar: compose */
+    .compose-card{background:var(--bg2);border:1px solid var(--card-bdr);border-radius:18px;padding:1.5rem;position:sticky;top:80px;animation:fadeup 0.5s ease both}
+    .compose-card h2{font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:0.4rem}
+    .compose-card p{font-size:0.82rem;color:var(--gray);margin-bottom:1rem}
+    .tag-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem}
+    .tag-btn{background:var(--bg3);border:1px solid var(--card-bdr);border-radius:50px;padding:0.3rem 0.8rem;font-size:0.78rem;cursor:pointer;color:var(--gray);transition:all 0.2s;font-family:var(--font-body)}
+    .tag-btn.active{border-color:var(--mint);color:var(--mint);background:var(--mintglow)}
+    textarea.compose-input{width:100%;background:var(--bg3);border:1px solid var(--card-bdr);border-radius:12px;padding:0.9rem;color:var(--white);font-family:var(--font-body);font-size:0.92rem;resize:none;min-height:110px;outline:none;transition:border-color 0.2s}
+    textarea.compose-input:focus{border-color:var(--mint)}
+    textarea.compose-input::placeholder{color:var(--gray)}
+    .char-count{font-size:0.75rem;color:var(--gray);text-align:right;margin-top:0.3rem}
+    .char-count.warn{color:var(--red)}
+    .post-btn{width:100%;margin-top:1rem;background:var(--mint);color:var(--bg);border:none;border-radius:50px;padding:0.85rem;font-family:var(--font-head);font-size:0.95rem;font-weight:700;cursor:pointer;box-shadow:0 0 20px rgba(10,255,178,0.25);transition:transform 0.2s,box-shadow 0.2s}
+    .post-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 35px rgba(10,255,178,0.45)}
+    .post-btn:disabled{opacity:0.45;cursor:not-allowed}
+    .anon-note{display:flex;align-items:center;gap:0.4rem;font-size:0.75rem;color:var(--gray);margin-top:0.8rem}
+
+    /* Main: feed */
+    .feed-col{animation:fadeup 0.5s 0.1s ease both}
+    .feed-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:0.8rem}
+    .feed-header h1{font-family:var(--font-head);font-size:1.4rem;font-weight:800}
+    .filter-tabs{display:flex;gap:0.5rem;flex-wrap:wrap}
+    .filter-tab{background:var(--bg3);border:1px solid var(--card-bdr);border-radius:50px;padding:0.3rem 0.8rem;font-size:0.78rem;cursor:pointer;color:var(--gray);transition:all 0.2s;font-family:var(--font-body)}
+    .filter-tab.active,.filter-tab:hover{background:var(--mintglow);border-color:var(--mint);color:var(--mint)}
+    .feed-list{display:flex;flex-direction:column;gap:1rem}
+    .post-card{background:var(--bg2);border:1px solid var(--card-bdr);border-radius:16px;padding:1.2rem 1.3rem;transition:border-color 0.2s,transform 0.2s;animation:fadeup 0.3s ease}
+    .post-card:hover{border-color:rgba(10,255,178,0.3);transform:translateY(-2px)}
+    .post-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem}
+    .post-tag{padding:0.25rem 0.7rem;border-radius:50px;font-size:0.72rem;font-weight:700}
+    .post-date{font-size:0.75rem;color:var(--gray)}
+    .post-content{font-size:0.93rem;line-height:1.7;color:var(--white);margin-bottom:1rem}
+    .post-actions{display:flex;align-items:center;gap:1rem}
+    .upvote-btn{display:flex;align-items:center;gap:0.4rem;background:var(--bg3);border:1px solid var(--card-bdr);border-radius:50px;padding:0.35rem 0.9rem;font-size:0.82rem;cursor:pointer;color:var(--gray);transition:all 0.2s;font-family:var(--font-body)}
+    .upvote-btn:hover:not(.voted){border-color:var(--mint);color:var(--mint)}
+    .upvote-btn.voted{border-color:var(--mint);color:var(--mint);background:var(--mintglow);cursor:default}
+    .post-anon{font-size:0.75rem;color:var(--gray);margin-left:auto;display:flex;align-items:center;gap:0.3rem}
+    .skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;margin-bottom:1rem}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .empty-feed{text-align:center;padding:3rem;color:var(--gray)}
+    .empty-feed .ei{font-size:2.5rem;margin-bottom:0.8rem}
+    .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--mint);color:var(--mint);padding:0.7rem 1.5rem;border-radius:50px;font-size:0.88rem;font-weight:600;opacity:0;transition:all 0.3s;z-index:300;pointer-events:none}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Tag colors */
+    .tag-study{background:rgba(56,189,248,0.12);color:#38BDF8}
+    .tag-anxiety{background:rgba(255,184,48,0.12);color:#FFB830}
+    .tag-motivation{background:rgba(10,255,178,0.12);color:#0AFFB2}
+    .tag-family{background:rgba(167,139,250,0.12);color:#A78BFA}
+    .tag-self-care{background:rgba(255,77,109,0.12);color:#FF4D6D}
+    .tag-general{background:rgba(90,138,160,0.12);color:#5A8AA0}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Mind<span>Bridge</span></a>
+  <ul class="nav-links">
+    <li><a href="/checkin.html">Check In</a></li>
+    <li><a href="/tracker.html">My Mood</a></li>
+    <li><a href="/chat.html">AI Chat</a></li>
+    <li><a href="/resources.html">Resources</a></li>
+    <li><a href="/community.html" class="active">Community</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+  <!-- LEFT: Feed -->
+  <div class="feed-col">
+    <div class="feed-header">
+      <h1 style="font-size: xx-large;";>Peer Community</h1>
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterPosts('All',this)">All</button>
+        <button class="filter-tab" onclick="filterPosts('Study',this)">📚 Study</button>
+        <button class="filter-tab" onclick="filterPosts('Anxiety',this)">😤 Anxiety</button>
+        <button class="filter-tab" onclick="filterPosts('Motivation',this)">💪 Motivation</button>
+        <button class="filter-tab" onclick="filterPosts('Self-Care',this)">🌿 Self-Care</button>
+      </div>
+    </div>
+    <div class="feed-list" id="feedList">
+      <div class="skeleton" style="height:100px"></div>
+      <div class="skeleton" style="height:80px"></div>
+      <div class="skeleton" style="height:120px"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Compose -->
+  <div class="compose-card">
+    <h2>Share Anonymously</h2>
+    <p>Your identity is never revealed. Support someone today.</p>
+    <div class="tag-row" id="tagRow">
+      <button class="tag-btn active" onclick="selectTag(this,'General')">General</button>
+      <button class="tag-btn" onclick="selectTag(this,'Study')">📚 Study</button>
+      <button class="tag-btn" onclick="selectTag(this,'Anxiety')">😤 Anxiety</button>
+      <button class="tag-btn" onclick="selectTag(this,'Motivation')">💪 Motivation</button>
+      <button class="tag-btn" onclick="selectTag(this,'Family')">👨‍👩‍👧 Family</button>
+      <button class="tag-btn" onclick="selectTag(this,'Self-Care')">🌿 Self-Care</button>
+    </div>
+    <textarea class="compose-input" id="postInput" maxlength="500"
+      placeholder="Share a tip, story, or encouragement... ✨"
+      oninput="updateCharCount()"></textarea>
+    <div class="char-count" id="charCount">0 / 500</div>
+    <button class="post-btn" id="postBtn" onclick="submitPost()">Post Anonymously →</button>
+    <div class="anon-note"><i class="fas fa-lock"></i> Your name is never shared</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/static/api.js"></script>
+<script>
+  let selectedTag = 'General';
+  const votedPosts = new Set(JSON.parse(localStorage.getItem('mb_voted') || '[]'));
+  const TAG_CLASSES = {Study:'tag-study',Anxiety:'tag-anxiety',Motivation:'tag-motivation',Family:'tag-family','Self-Care':'tag-self-care',General:'tag-general'};
+
+  function selectTag(btn, tag) {
+    document.querySelectorAll('#tagRow .tag-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTag = tag;
+  }
+
+  function updateCharCount() {
+    const len = document.getElementById('postInput').value.length;
+    const el = document.getElementById('charCount');
+    el.textContent = `${len} / 500`;
+    el.className = 'char-count' + (len > 450 ? ' warn' : '');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function timeAgo(iso) {
+    const diff = (Date.now() - new Date(iso)) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    return Math.floor(diff/86400) + 'd ago';
+  }
+
+  function renderPost(post) {
+    const tagClass = TAG_CLASSES[post.tag] || 'tag-general';
+    const voted = votedPosts.has(post.id);
+    const div = document.createElement('div');
+    div.className = 'post-card';
+    div.dataset.postId = post.id;
+    div.innerHTML = `
+      <div class="post-top">
+        <span class="post-tag ${tagClass}">${post.tag}</span>
+        <span class="post-date">${timeAgo(post.date)}</span>
+      </div>
+      <p class="post-content">${post.content.replace(/</g,'&lt;')}</p>
+      <div class="post-actions">
+        <button class="upvote-btn ${voted ? 'voted' : ''}" onclick="upvote(${post.id},this)" ${voted ? 'disabled' : ''}>
+          <i class="fas fa-heart"></i> <span class="upvote-count">${post.upvotes}</span>
+        </button>
+        <span class="post-anon"><i class="fas fa-user-secret"></i> Anonymous</span>
+      </div>`;
+    return div;
+  }
+
+  async function loadPosts(tag = 'All') {
+    const list = document.getElementById('feedList');
+    list.innerHTML = '<div class="skeleton" style="height:100px"></div><div class="skeleton" style="height:80px"></div>';
+    try {
+      const data = await CommunityAPI.getPosts(tag);
+      list.innerHTML = '';
+      if (!data.posts.length) {
+        list.innerHTML = `<div class="empty-feed"><div class="ei">🌱</div><p>No posts yet. Be the first to share something!</p></div>`;
+        return;
+      }
+      data.posts.forEach(p => list.appendChild(renderPost(p)));
+    } catch {
+      list.innerHTML = `<div class="empty-feed"><div class="ei">⚠️</div><p>Could not load posts. Is the server running?</p></div>`;
+    }
+  }
+
+  function filterPosts(tag, btn) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    loadPosts(tag);
+  }
+
+  async function submitPost() {
+    const content = document.getElementById('postInput').value.trim();
+    if (content.length < 5) { showToast('Post too short!'); return; }
+    const btn = document.getElementById('postBtn');
+    btn.disabled = true; btn.textContent = 'Posting...';
+    try {
+      await CommunityAPI.createPost(content, selectedTag);
+      document.getElementById('postInput').value = '';
+      updateCharCount();
+      showToast('✅ Posted anonymously!');
+      loadPosts();
+    } catch(e) {
+      showToast('Error posting. Server running?');
+    }
+    btn.disabled = false; btn.textContent = 'Post Anonymously →';
+  }
+
+  async function upvote(postId, btn) {
+    if (votedPosts.has(postId)) return;
+    try {
+      const data = await CommunityAPI.upvote(postId);
+      if (data.success) {
+        votedPosts.add(postId);
+        localStorage.setItem('mb_voted', JSON.stringify([...votedPosts]));
+        btn.classList.add('voted'); btn.disabled = true;
+        btn.querySelector('.upvote-count').textContent = data.upvotes;
+        showToast('💚 Thanks for the love!');
+      }
+    } catch {}
+  }
+
+  loadPosts();
+</script>
+</body>
+</html>

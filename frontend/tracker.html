@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MindBridge — My Mood Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#08101A;--bg2:#0D1F30;--bg3:#112438;--mint:#0AFFB2;--mintglow:rgba(10,255,178,0.12);--red:#FF4D6D;--amber:#FFB830;--blue:#38BDF8;--white:#E8F4FF;--gray:#5A8AA0;--card-bdr:#1A3A55;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+    body{background:var(--bg);color:var(--white);font-family:var(--font-body);min-height:100vh}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 5%;background:rgba(8,16,26,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--card-bdr);position:sticky;top:0;z-index:100}
+    .nav-logo{font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:var(--mint);text-decoration:none}
+    .nav-logo span{color:var(--white)}
+    .nav-links{display:flex;gap:1.5rem;list-style:none}
+    .nav-links a{color:var(--gray);text-decoration:none;font-size:0.85rem;transition:color 0.2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--mint)}
+    .nav-cta{background:var(--mint);color:var(--bg);padding:0.45rem 1.2rem;border-radius:50px;font-weight:700;font-size:0.85rem;text-decoration:none}
+    .page-wrap{max-width:920px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+    .page-header{margin-bottom:2rem;animation:fadeup 0.5s ease both}
+    .page-header h1{font-family:var(--font-head);font-size:1.8rem;font-weight:800;letter-spacing:-0.5px}
+    .page-header p{color:var(--gray);margin-top:0.3rem}
+    /* range selector */
+    .range-tabs{display:flex;gap:0.5rem;margin-bottom:1.5rem;animation:fadeup 0.5s 0.05s ease both}
+    .range-tab{background:var(--bg3);border:1px solid var(--card-bdr);border-radius:50px;padding:0.35rem 1rem;font-size:0.82rem;cursor:pointer;color:var(--gray);transition:all 0.2s;font-family:var(--font-body)}
+    .range-tab.active,.range-tab:hover{background:var(--mintglow);border-color:var(--mint);color:var(--mint)}
+    /* summary */
+    .summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem;animation:fadeup 0.5s 0.1s ease both}
+    .summary-chip{background:var(--bg2);border:1px solid var(--card-bdr);border-radius:14px;padding:1.2rem 1rem;text-align:center;transition:border-color 0.3s}
+    .summary-chip:hover{border-color:var(--mint)}
+    .chip-num{font-family:var(--font-head);font-size:1.8rem;font-weight:800;color:var(--mint);display:block}
+    .chip-label{font-size:0.78rem;color:var(--gray);text-transform:uppercase;letter-spacing:1px}
+    /* chart */
+    .chart-card{background:var(--bg2);border:1px solid var(--card-bdr);border-radius:18px;padding:1.8rem;margin-bottom:1.5rem;animation:fadeup 0.5s 0.2s ease both}
+    .chart-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+    .chart-card-header h2{font-family:var(--font-head);font-size:1rem;font-weight:700}
+    .chart-wrap{position:relative;height:220px}
+    /* log */
+    .log-card{background:var(--bg2);border:1px solid var(--card-bdr);border-radius:18px;padding:1.5rem;animation:fadeup 0.5s 0.3s ease both}
+    .log-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem}
+    .log-header h2{font-family:var(--font-head);font-size:1rem;font-weight:700}
+    .log-list{display:flex;flex-direction:column;gap:0.8rem;max-height:400px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--card-bdr) transparent}
+    .log-item{display:flex;align-items:flex-start;gap:0.8rem;background:var(--bg3);border:1px solid var(--card-bdr);border-radius:12px;padding:0.9rem 1rem;transition:border-color 0.2s}
+    .log-item:hover{border-color:var(--card-bdr)}
+    .log-emoji{font-size:1.5rem;flex-shrink:0}
+    .log-info{flex:1}
+    .log-info h4{font-size:0.9rem;font-weight:600;margin-bottom:0.2rem}
+    .log-note{font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.2rem}
+    .log-date{font-size:0.75rem;color:var(--gray);white-space:nowrap}
+    .mood-bar{height:4px;border-radius:2px;margin-top:0.4rem;transition:width 0.5s}
+    .empty-state{text-align:center;padding:3rem;color:var(--gray)}
+    .empty-state .empty-icon{font-size:3rem;margin-bottom:1rem}
+    .empty-state a{color:var(--mint);text-decoration:none;font-weight:600}
+    .loading{text-align:center;padding:2rem;color:var(--gray)}
+    .skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;height:60px;margin-bottom:0.8rem}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    @keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Mind<span>Bridge</span></a>
+  <ul class="nav-links">
+    <li><a href="/checkin.html">Check In</a></li>
+    <li><a href="/tracker.html" class="active">My Mood</a></li>
+    <li><a href="/chat.html">AI Chat</a></li>
+    <li><a href="/resources.html">Resources</a></li>
+    <li><a href="/community.html">Community</a></li>
+  </ul>
+  <a href="/checkin.html" class="nav-cta">+ Check In</a>
+</nav>
+<div class="page-wrap">
+  <div class="page-header">
+    <h1>📊 Your Mood Journey</h1>
+    <p>Your data is private and stored securely. Only you can see this.</p>
+  </div>
+
+  <div class="range-tabs">
+    <button class="range-tab active" onclick="loadData(7,this)">7 Days</button>
+    <button class="range-tab" onclick="loadData(14,this)">14 Days</button>
+    <button class="range-tab" onclick="loadData(30,this)">30 Days</button>
+  </div>
+
+  <div class="summary-row">
+    <div class="summary-chip"><span class="chip-num" id="statTotal">—</span><span class="chip-label">Check-ins</span></div>
+    <div class="summary-chip"><span class="chip-num" id="statStreak">—</span><span class="chip-label">Day Streak 🔥</span></div>
+    <div class="summary-chip"><span class="chip-num" id="statAvg">—</span><span class="chip-label">Avg Mood</span></div>
+    <div class="summary-chip"><span class="chip-num" id="statBest">—</span><span class="chip-label">Best Day</span></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <h2>📈 Mood Over Time</h2>
+      <span style="font-size:0.8rem;color:var(--gray)" id="chartLabel">Last 7 days</span>
+    </div>
+    <div class="chart-wrap"><canvas id="moodChart"></canvas></div>
+  </div>
+
+  <div class="log-card">
+    <div class="log-header">
+      <h2>📋 Check-in History</h2>
+    </div>
+    <div class="log-list" id="logList">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/api.js"></script>
+<script>
+  const EMOJIS = ['','😢','😟','😐','🙂','😄'];
+  const LABELS = ['','Struggling','Low','Okay','Good','Great'];
+  const COLORS = ['','#38BDF8','#FF4D6D','#FFB830','#A8E6CF','#0AFFB2'];
+  const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let moodChart = null;
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + ' ' +
+           d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  }
+
+  async function loadData(days = 7, tabEl = null) {
+    if (tabEl) {
+      document.querySelectorAll('.range-tab').forEach(t => t.classList.remove('active'));
+      tabEl.classList.add('active');
+      document.getElementById('chartLabel').textContent = `Last ${days} days`;
+    }
+
+    try {
+      const data = await MoodAPI.history(days);
+
+      // Summary stats
+      document.getElementById('statTotal').textContent  = data.total;
+      document.getElementById('statStreak').textContent = '🔥 ' + data.streak;
+      document.getElementById('statAvg').textContent    = data.avg ? EMOJIS[Math.round(data.avg)] : '—';
+
+      if (data.moods.length > 0) {
+        const best = data.moods.reduce((a,b) => a.mood >= b.mood ? a : b);
+        document.getElementById('statBest').textContent = DAYS[new Date(best.date).getDay()];
+      } else {
+        document.getElementById('statBest').textContent = '—';
+      }
+
+      // Build chart labels (last N days)
+      const today = new Date();
+      const chartLabels = [], chartValues = [];
+      for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(today); d.setDate(d.getDate() - i);
+        const ds = d.toDateString();
+        const entries = data.moods.filter(m => new Date(m.date).toDateString() === ds);
+        chartLabels.push(i === 0 ? 'Today' : DAYS[d.getDay()]);
+        chartValues.push(entries.length ? Math.round(entries.reduce((s,e) => s + e.mood, 0) / entries.length) : null);
+      }
+
+      // Destroy old chart
+      if (moodChart) moodChart.destroy();
+      moodChart = new Chart(document.getElementById('moodChart'), {
+        type: 'line',
+        data: {
+          labels: chartLabels,
+          datasets: [{
+            data: chartValues,
+            borderColor: '#0AFFB2',
+            backgroundColor: 'rgba(10,255,178,0.07)',
+            borderWidth: 2.5,
+            pointBackgroundColor: chartValues.map(v => v ? COLORS[v] : 'transparent'),
+            pointBorderColor: '#0AFFB2',
+            pointRadius: 6, pointHoverRadius: 9,
+            fill: true, tension: 0.4, spanGaps: true,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: {
+              label: ctx => ctx.raw ? EMOJIS[ctx.raw] + ' ' + LABELS[ctx.raw] : 'No data'
+            }}
+          },
+          scales: {
+            y: { min: 0, max: 6, ticks: { callback: v => EMOJIS[v] || '', color:'#5A8AA0', stepSize:1 }, grid:{ color:'rgba(90,138,160,0.08)' } },
+            x: { ticks:{ color:'#5A8AA0', font:{ size:11 } }, grid:{ display:false } }
+          }
+        }
+      });
+
+      // Log list
+      const logList = document.getElementById('logList');
+      if (data.moods.length === 0) {
+        logList.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No check-ins yet for this period.</p><a href="/checkin.html">Do your first check-in →</a></div>`;
+        return;
+      }
+      logList.innerHTML = '';
+      data.moods.forEach(item => {
+        const pct = ((item.mood / 5) * 100).toFixed(0);
+        const div = document.createElement('div');
+        div.className = 'log-item';
+        div.innerHTML = `
+          <div class="log-emoji">${item.emoji}</div>
+          <div class="log-info">
+            <h4>${item.label}</h4>
+            ${item.note ? `<p class="log-note">"${item.note}"</p>` : ''}
+            <div class="mood-bar" style="width:${pct}%;background:${COLORS[item.mood]}"></div>
+          </div>
+          <div class="log-date">${formatDate(item.date)}</div>`;
+        logList.appendChild(div);
+      });
+
+    } catch(e) {
+      document.getElementById('logList').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not load data. Is the server running?</p><a href="/checkin.html">Go check in →</a></div>`;
+    }
+  }
+
+  loadData(7);
+</script>
+</body>
+</html>

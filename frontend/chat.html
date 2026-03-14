@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MindBridge — AI Chat Support</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#08101A;--bg2:#0D1F30;--bg3:#112438;--mint:#0AFFB2;--mintglow:rgba(10, 255, 177, 0.486);--red:#FF4D6D;--amber:#FFB830;--white:#E8F4FF;--gray:#5A8AA0;--card-bdr:#1A3A55;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+    body{background:var(--bg);color:var(--white);font-family:var(--font-body);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 5%;background:rgba(12, 27, 44, 0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--card-bdr);flex-shrink:0}
+    .nav-logo{font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:var(--mint);text-decoration:none}
+    .nav-logo span{color:var(--white)}
+    .nav-links{display:flex;gap:1.5rem;list-style:none}
+    .nav-links a{color:var(--gray);text-decoration:none;font-size:0.85rem;transition:color 0.2s}
+    .nav-links a:hover{color:var(--mint)}
+    .crisis-banner{display:none;background:rgba(255,77,109,0.1);border-bottom:1px solid var(--red);padding:0.8rem 5%;flex-shrink:0;animation:slideDown 0.4s ease}
+    .crisis-banner.show{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
+    .crisis-banner p{font-size:0.9rem}
+    .crisis-banner strong{color:var(--red)}
+    .crisis-call{background:var(--red);color:#fff;padding:0.4rem 1.2rem;border-radius:50px;text-decoration:none;font-size:0.85rem;font-weight:700;white-space:nowrap}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    .chat-container{display:flex;flex-direction:column;max-width:760px;width:100%;margin:0 auto;flex:1;overflow:hidden;padding:0 1rem}
+    .ai-status{display:flex;align-items:center;gap:0.8rem;padding:1rem 0;border-bottom:1px solid var(--card-bdr);flex-shrink:0}
+    .ai-avatar{width:40px;height:40px;background:var(--mintglow);border:2px solid var(--mint);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .ai-info h3{font-family:var(--font-head);font-size:0.95rem;font-weight:700}
+    .ai-info p{font-size:0.78rem;color:var(--gray);display:flex;align-items:center;gap:0.3rem}
+    .online-dot{width:7px;height:7px;background:var(--mint);border-radius:50%;display:inline-block;animation:pulse 1.8s infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+    .disclaimer-chip{margin-left:auto;background:var(--bg3);border:1px solid var(--card-bdr);border-radius:50px;padding:0.3rem 0.8rem;font-size:0.72rem;color:var(--gray)}
+    .messages{flex:1;overflow-y:auto;padding:1.5rem 0;display:flex;flex-direction:column;gap:1.2rem;scrollbar-width:thin;scrollbar-color:var(--card-bdr) transparent}
+    .message{display:flex;gap:0.8rem;max-width:85%;animation:msgIn 0.3s ease}
+    @keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .message.user{align-self:flex-end;flex-direction:row-reverse}
+    .message.ai{align-self:flex-start}
+    .msg-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.9rem;margin-top:2px}
+    .ai .msg-avatar{background:var(--mintglow);border:1px solid rgba(10,255,178,0.3)}
+    .user .msg-avatar{background:var(--bg3);border:1px solid var(--card-bdr)}
+    .msg-bubble{padding:0.9rem 1.1rem;border-radius:18px;font-size:0.93rem;line-height:1.6}
+    .ai .msg-bubble{background:var(--bg2);border:1px solid var(--card-bdr);border-bottom-left-radius:4px;color:var(--white)}
+    .user .msg-bubble{background:var(--mint);color:var(--bg);font-weight:500;border-bottom-right-radius:4px}
+    .msg-time{font-size:0.72rem;color:var(--gray);margin-top:0.3rem}
+    .user .msg-time{text-align:right}
+    .typing{display:flex;gap:4px;align-items:center;padding:0.7rem 1rem}
+    .typing span{width:7px;height:7px;background:var(--gray);border-radius:50%;animation:bounce 1.2s infinite}
+    .typing span:nth-child(2){animation-delay:0.15s}
+    .typing span:nth-child(3){animation-delay:0.3s}
+    @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+    .quick-replies{display:flex;gap:0.6rem;flex-wrap:wrap;padding:0.8rem 0;flex-shrink:0}
+    .quick-reply{background:var(--bg3);border:1px solid var(--card-bdr);border-radius:50px;padding:0.45rem 1rem;font-size:0.82rem;color:var(--gray);cursor:pointer;transition:all 0.2s;font-family:var(--font-body)}
+    .quick-reply:hover{border-color:var(--mint);color:var(--mint)}
+    .input-bar{display:flex;gap:0.8rem;align-items:flex-end;padding:1rem 0 1.5rem;flex-shrink:0;border-top:1px solid var(--card-bdr)}
+    .input-wrap{flex:1;background:var(--bg2);border:1px solid var(--card-bdr);border-radius:16px;display:flex;align-items:center;padding:0.6rem 1rem;transition:border-color 0.2s}
+    .input-wrap:focus-within{border-color:var(--mint)}
+    #chatInput{flex:1;background:none;border:none;outline:none;color:var(--white);font-family:var(--font-body);font-size:0.95rem;resize:none;max-height:100px}
+    #chatInput::placeholder{color:var(--gray)}
+    .send-btn{width:46px;height:46px;border-radius:50%;background:var(--mint);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:1rem;flex-shrink:0;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 0 20px rgba(10,255,178,0.3)}
+    .send-btn:hover{transform:scale(1.08);box-shadow:0 0 30px rgba(10,255,178,0.5)}
+    .send-btn:disabled{opacity:0.4;cursor:not-allowed}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Mind<span>Bridge</span></a>
+  <ul class="nav-links">
+    <li><a href="/checkin.html">Check In</a></li>
+    <li><a href="/tracker.html">My Mood</a></li>
+    <li><a href="/resources.html">Resources</a></li>
+    <li><a href="/community.html">Community</a></li>
+  </ul>
+</nav>
+<div class="crisis-banner" id="crisisBanner">
+  <p><strong>🐦‍🔥 We're concerned about you.</strong> Please reach out to a professional right now. You're not alone.</p>
+  <a href="tel:9152987821" class="crisis-call">📞 Call iCall: 9152987821</a>
+</div>
+<div class="chat-container">
+  <div class="ai-status">
+    <div class="ai-avatar">🦚</div>
+    <div class="ai-info"><h3>MindBridge AI</h3><p><span class="online-dot"></span>Online · here for you 24/7</p></div>
+    <div class="disclaimer-chip">Not a substitute for professional care</div>
+  </div>
+  <div class="messages" id="messages">
+    <div class="message ai">
+      <div class="msg-avatar">🦚</div>
+      <div>
+        <div class="msg-bubble">Hey, I'm glad you're here. 💚<br><br>This is a safe, anonymous space. You can share anything — I'm here to listen without judgment. What's on your mind today?</div>
+        <div class="msg-time">Just now</div>
+      </div>
+    </div>
+  </div>
+  <div class="quick-replies" id="quickReplies">
+    <button class="quick-reply" onclick="sendQuick('I am feeling anxious')">😟 Feeling anxious</button>
+    <button class="quick-reply" onclick="sendQuick('I cannot sleep')">😴 Can\'t sleep</button>
+    <button class="quick-reply" onclick="sendQuick('I have exam stress')">📚 Exam stress</button>
+    <button class="quick-reply" onclick="sendQuick('I feel lonely')">😔 Feeling lonely</button>
+    <button class="quick-reply" onclick="sendQuick('Family pressure is getting to me')">😤 Family pressure</button>
+    <button class="quick-reply" onclick="sendQuick('Just checking in, I am doing okay')">😊 Just checking in</button>
+  </div>
+  <div class="input-bar">
+    <div class="input-wrap">
+      <textarea id="chatInput" placeholder="Type how you're feeling..." rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+<script src="/static/api.js"></script>
+<script>
+  let isWaiting = false;
+
+  function getTime() {
+    return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function addMessage(text, sender) {
+    const msgs = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = `message ${sender}`;
+    const avatar = sender === 'ai' ? '💭' : '😊';
+    div.innerHTML = `
+      <div class="msg-avatar">${avatar}</div>
+      <div>
+        <div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>
+        <div class="msg-time">${getTime()}</div>
+      </div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showTyping() {
+    const msgs = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'message ai'; div.id = 'typingIndicator';
+    div.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('typingIndicator');
+    if (t) t.remove();
+  }
+
+  async function sendMessage() {
+    if (isWaiting) return;
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+    input.value = ''; input.style.height = 'auto';
+    document.getElementById('quickReplies').style.display = 'none';
+    isWaiting = true;
+    document.getElementById('sendBtn').disabled = true;
+
+    showTyping();
+
+    try {
+      const data = await ChatAPI.send(text);
+      // Simulate realistic typing delay
+      await new Promise(r => setTimeout(r, 800 + Math.random() * 600));
+      removeTyping();
+      addMessage(data.response, 'ai');
+      if (data.is_crisis) {
+        document.getElementById('crisisBanner').classList.add('show');
+      }
+    } catch(e) {
+      removeTyping();
+      addMessage("Sorry, I'm having trouble connecting. Please check that the server is running, or call iCall: 9152987821 if you need help now.", 'ai');
+    }
+
+    isWaiting = false;
+    document.getElementById('sendBtn').disabled = false;
+  }
+
+  function sendQuick(text) {
+    document.getElementById('chatInput').value = text;
+    sendMessage();
+  }
+
+  // Load previous chat history from backend
+  async function loadHistory() {
+    try {
+      const data = await ChatAPI.history();
+      if (data.messages && data.messages.length > 0) {
+        // Clear welcome message and reload history
+        document.getElementById('messages').innerHTML = '';
+        data.messages.forEach(m => addMessage(m.content, m.role));
+      }
+    } catch {}
+  }
+  loadHistory();
+</script>
+</body>
+</html>

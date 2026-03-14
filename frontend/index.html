@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MindBridge — Mental Health Support for Students</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#08101A;--bg2:#0D1F30;--bg3:#112438;--mint:#0AFFB2;--mintglow:rgba(10,255,178,0.12);--red:#FF4D6D;--amber:#FFB830;--white:#E8F4FF;--gray:#5A8AA0;--card-bdr:#1A3A55;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+    body{background:var(--bg);color:var(--white);font-family:var(--font-body);min-height:100vh}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 5%;background:rgba(8,16,26,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--card-bdr);position:sticky;top:0;z-index:100}
+    .nav-logo{font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:var(--mint);text-decoration:none}
+    .nav-logo span{color:var(--white)}
+    .nav-links{display:flex;gap:1.5rem;list-style:none}
+    .nav-links a{color:var(--gray);text-decoration:none;font-size:0.85rem;transition:color 0.2s}
+    .nav-links a:hover{color:var(--mint)}
+    .nav-cta{background:var(--mint);color:var(--bg);padding:0.45rem 1.2rem;border-radius:50px;font-weight:700;font-size:0.85rem;text-decoration:none}
+    .hero{text-align:center;padding:5rem 2rem 3rem;animation:fadeup 0.6s ease both}
+    .hero-tag{display:inline-block;background:var(--mintglow);border:1px solid rgba(10,255,178,0.3);color:var(--mint);padding:0.3rem 1rem;border-radius:50px;font-size:0.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:1.5rem}
+    .hero h1{font-family:var(--font-head);font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:1rem}
+    .hero h1 span{color:var(--mint)}
+    .hero p{color:var(--gray);font-size:1.05rem;max-width:520px;margin:0 auto 2.5rem;line-height:1.7}
+    .cta-group{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+    .btn-primary{background:var(--mint);color:var(--bg);padding:0.9rem 2.2rem;border-radius:50px;font-weight:800;font-size:1rem;text-decoration:none;font-family:var(--font-head);box-shadow:0 0 30px rgba(10,255,178,0.35);transition:transform 0.2s,box-shadow 0.2s}
+    .btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(10,255,178,0.5)}
+    .btn-outline{background:transparent;color:var(--white);padding:0.9rem 2.2rem;border-radius:50px;font-weight:700;font-size:1rem;text-decoration:none;border:1px solid var(--card-bdr);transition:border-color 0.2s}
+    .btn-outline:hover{border-color:var(--mint);color:var(--mint)}
+    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem;max-width:960px;margin:0 auto;padding:2rem 2rem 5rem;animation:fadeup 0.6s 0.2s ease both}
+    .feat{background:var(--bg2);border:1px solid var(--card-bdr);border-radius:18px;padding:1.8rem;transition:border-color 0.2s,transform 0.2s}
+    .feat:hover{border-color:rgba(10,255,178,0.4);transform:translateY(-4px)}
+    .feat-icon{font-size:2rem;margin-bottom:1rem}
+    .feat h3{font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:0.5rem}
+    .feat p{font-size:0.85rem;color:var(--gray);line-height:1.6}
+    .feat a{display:inline-block;margin-top:1rem;color:var(--mint);font-size:0.85rem;font-weight:600;text-decoration:none}
+    @keyframes fadeup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Mind<span>Bridge</span></a>
+  <ul class="nav-links">
+    <li><a href="/checkin.html">Check In</a></li>
+    <li><a href="/tracker.html">My Mood</a></li>
+    <li><a href="/chat.html">AI Chat</a></li>
+    <li><a href="/resources.html">Resources</a></li>
+    <li><a href="/community.html">Community</a></li>
+  </ul>
+  <a href="/checkin.html" class="nav-cta">Get Started</a>
+</nav>
+<div class="hero">
+  <div class="hero-tag">🧠 For Indian College Students</div>
+  <h1>Your mental health<br>matters. <span>We're here.</span></h1>
+  <p>A safe, anonymous space to track your mood, talk to AI support, and connect with peers who understand.</p>
+  <div class="cta-group">
+    <a href="/checkin.html" class="btn-primary">Start Daily Check-In →</a>
+    <a href="/chat.html" class="btn-outline">Talk to AI Support</a>
+  </div>
+</div>
+<div class="features">
+  <div class="feat"><div class="feat-icon">😊</div><h3>Daily Mood Check-In</h3><p>Track how you feel each day in seconds. Build self-awareness over time.</p><a href="/checkin.html">Check in now →</a></div>
+  <div class="feat"><div class="feat-icon">📈</div><h3>Mood Tracker</h3><p>Visualize your emotional patterns over 7, 14, or 30 days with beautiful charts.</p><a href="/tracker.html">View my mood →</a></div>
+  <div class="feat"><div class="feat-icon">💬</div><h3>AI Chat Support</h3><p>Talk to MindBridge AI anytime — exam stress, anxiety, loneliness, or just to vent.</p><a href="/chat.html">Start chatting →</a></div>
+  <div class="feat"><div class="feat-icon">🤝</div><h3>Peer Community</h3><p>Share anonymously, read others' experiences, and give support to fellow students.</p><a href="/community.html">Join community →</a></div>
+  <div class="feat"><div class="feat-icon">📚</div><h3>Resources & Help</h3><p>Crisis helplines, professional support, and self-help techniques — all in one place.</p><a href="/resources.html">Find help →</a></div>
+</div>
+</body>
+</html>

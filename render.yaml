@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: mindbridge
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false        # ← You paste this manually in Render dashboard
+      - key: DATA_DIR
+        value: /data       # ← Points to persistent disk below
+    disk:
+      name: mindbridge-db
+      mountPath: /data
+      sizeGB: 1
