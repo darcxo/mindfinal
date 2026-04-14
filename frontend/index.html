@@ -709,7 +709,7 @@
 <section class="hero">
   <div class="hero-tag">
     <span class="tag-dot"></span>
-    🦚✨ For All Students
+    🧠 For Indian College Students
   </div>
   <h1 class="hero-title">
     <span class="line"><span class="line-inner">Your mental</span></span>
@@ -803,6 +803,37 @@
 </footer>
 
 <script>
+// ─── Custom Cursor ───────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+});
+
+function animRing() {
+  rx += (mx - rx - 20) * 0.12;
+  ry += (my - ry - 20) * 0.12;
+  ring.style.transform = `translate(${rx}px, ${ry}px)`;
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.transform += ' scale(1.5)';
+    ring.style.width = '60px';
+    ring.style.height = '60px';
+    ring.style.borderColor = 'rgba(0,255,178,0.6)';
+  });
+  el.addEventListener('mouseleave', () => {
+    ring.style.width = '40px';
+    ring.style.height = '40px';
+    ring.style.borderColor = 'rgba(0,255,178,0.4)';
+  });
+});
 
 // ─── Star Canvas ─────────────────────────────────────────
 const canvas = document.getElementById('bg-canvas');
